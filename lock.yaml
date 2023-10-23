@@ -25,12 +25,57 @@ wifi:
 
 captive_portal:
 
+# Just a button for internal control
+binary_sensor:
+  - platform: gpio
+    name: "Internal button"
+    pin:
+      number: D7
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    on_press:
+      then:
+        lambda: |-
+          if (id(lcd_lock).state == LOCK_STATE_LOCKED) {
+            id(lcd_lock).unlock();
+          } else if (id(lcd_lock).state == LOCK_STATE_UNLOCKED) {
+            id(lcd_lock).lock();
+          }
+
 output:
   - platform: gpio
     pin: D1
     id: 'generic_out'
 
+stepper:
+  - platform: a4988
+    id: step_motor
+    step_pin: D2
+    dir_pin: D5
+    max_speed:    250 steps/s
+    acceleration: 10  steps/s^2
+    deceleration: 10  steps/s^2
+
+    # Optional:
+    sleep_pin: D6
+
 lock:
   - platform: output
     name: "LCD Lock"
+    id: lcd_lock
     output: 'generic_out'
+    on_lock:
+      then:
+        - stepper.set_target:
+            id: step_motor
+            target: 250
+        - lambda: ESP_LOGD("lambda", "Lock the LCD");
+
+    on_unlock:
+      then:
+        - stepper.set_target:
+            id: step_motor
+            target: 0
+        - lambda: ESP_LOGD("lambda", "Unlock the LCD");
