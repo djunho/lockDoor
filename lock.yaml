@@ -23,6 +23,9 @@ wifi:
     ssid: "lockDoor Fallback Hotspot"
     password: "tPmNJGuLme7T"
 
+web_server:
+  port: 80
+
 captive_portal:
 
 # Just a button for internal control
@@ -30,7 +33,7 @@ binary_sensor:
   - platform: gpio
     name: "Internal button"
     pin:
-      number: D7
+      number: D7      # GPIO13
       inverted: true
       mode:
         input: true
@@ -46,20 +49,20 @@ binary_sensor:
 
 output:
   - platform: gpio
-    pin: D1
+    pin: D2   # GPIO 4
     id: 'generic_out'
 
 stepper:
   - platform: a4988
     id: step_motor
-    step_pin: D2
-    dir_pin: D5
-    max_speed:    250 steps/s
-    acceleration: 10  steps/s^2
-    deceleration: 10  steps/s^2
+    step_pin: D1    # GPIO 5
+    dir_pin: D5     # GPIO 14
+    max_speed:    400 steps/s
+    acceleration: 100  steps/s^2
+    deceleration: 100  steps/s^2
 
     # Optional:
-    sleep_pin: D6
+    sleep_pin: D6   # GPIO 12
 
 lock:
   - platform: output
